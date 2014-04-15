@@ -4,7 +4,7 @@ This will allow to transform DOM tree patches against each other (see #Transform
 ## Operations
 ```
   MOV: fromPath, toPath
-  MAN: path, [attr|value]:[null, {String}]
+  MAN: path, property:[null, {String}]
 
 DEL ^= MOV(fromPath, null)
 INS ^= MOV(null, toPath) // corresponding tree is in accompanying stack
@@ -43,7 +43,7 @@ if op1.fromPath == op2.fromPath but op1.toPath != op2.toPath
 if op1.toPath ends on the same level as op2.fromPath and op2.fromPath comes after op1.toPath
   adjust op2.fromPath (shift to right)
 
-if op1.fromPath ends on the same level as op2.fromPath and op2.fromPath comes after op1.toPath
+if op1.fromPath ends on the same level as op2.fromPath and op2.fromPath comes after op1.fromPath
   adjust op2.fromPath (shift to left)
 
 if op1.toPath ends on the same level as op2.toPath and op2.toPath comes after op1.toPath
