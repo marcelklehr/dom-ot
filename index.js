@@ -4,12 +4,19 @@ exports.create = function(initialData) {
 
 }
 
-exports.apply = function(snapshot, op) {
-
+exports.apply = function(snapshot, ops) {
+  ops
+  .forEach(function(op) {
+    op.apply(snapshot)
+  })
 }
 
-exports.transform = function(op1, op2, side) {
-  op1.transformAgainst(op2, ('left'==side))
+exports.transform = function(ops1, ops2, side) {
+  ops1.forEach(function(op1) {
+    ops2.forEach(function(op2) {
+      op1.transformAgainst(op2, ('left'==side))
+    })
+  })
 }
 
 exports.compose  = function(op1, op2) {
