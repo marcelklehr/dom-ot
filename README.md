@@ -1,6 +1,12 @@
 # dom-ot
 The DOM changes. You can [capture](https://github.com/marcelklehr/mutation-summary) those changes and [sync](https://github.com/marcelklehr/gulf) multiple documents in real-time using this library to transform the changes.
 
+## Install
+
+```
+npm install dom-ot
+```
+
 ## Operations
 ```
   MOV: fromPath, toPath
