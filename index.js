@@ -18,3 +18,5 @@ exports.compose  = function(op1, op2) {
 
 exports.Move = require('./lib/index').Move
 exports.Manipulate = require('./lib/index').Manipulate
+exports.ManipulateText = require('./lib/index').ManipulateText
+exports.adapters = require('./lib/index').adapters
