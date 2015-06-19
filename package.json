@@ -1,6 +1,6 @@
 {
   "name": "dom-ot",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Operational transform library for DOM operations (conforms to shareJS' spec)",
   "main": "index.js",
   "directories": {
