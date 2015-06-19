@@ -1,0 +1,28 @@
+{
+  "name": "dom-ot",
+  "version": "1.0.0",
+  "description": "Operational transform library for DOM operations (conforms to shareJS' spec)",
+  "main": "index.js",
+  "directories": {
+    "test": "test"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/marcelklehr/dom-ot.git"
+  },
+  "keywords": [
+    "operational",
+    "transformation",
+    "ot",
+    "dom"
+  ],
+  "author": "Marcel Klehr <mklehr@gmx.net>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/marcelklehr/dom-ot/issues"
+  },
+  "homepage": "https://github.com/marcelklehr/dom-ot#readme"
+}
