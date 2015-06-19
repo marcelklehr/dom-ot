@@ -6,8 +6,16 @@
   "directories": {
     "test": "test"
   },
+  "devDependencies": {
+    "browserify": "^10.1.0",
+    "chai": "^2.3.0",
+    "mocha": "^2.2.4",
+    "mocha-phantomjs": "^3.5.3",
+    "phantomjs": "^1.9.17"
+  },
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "mocha-phantomjs test/index.html",
+    "dist": "browserify index.js -s domOT > bundle.js"
   },
   "repository": {
     "type": "git",
