@@ -1,6 +1,8 @@
 var chai = require('chai')
   , should = chai.should()
+  , expect = chai.expect
   , domOT = require('../')
+  , MutationSummary = require('./lib/mutation-summary')
 
 describe('dom-ot', function() {
   describe('transformations', function() {
@@ -170,6 +172,107 @@ describe('dom-ot', function() {
         , move2 = new domOT.Move([0,1], [1,1])
       manipulate.transformAgainst(move2)
       manipulate.path.should.deep.equal([1,1])
+    })
+  })
+  
+  describe('mutationSummary adapter', function() {
+    var div
+    beforeEach(function() {
+      div = document.createElement('div')
+    })
+    
+    it('should overtake inserts', function(cb) {
+      var observer = new MutationSummary({
+        callback: onChange, // required
+        rootNode: div,
+        oldPreviousSibling: true,
+        queries: [ { all: true} ]
+      })
+      
+      div.appendChild(document.createElement('p'))
+
+      function onChange(summaries) {
+        var ops = domOT.adapters.mutationSummary.import(summaries[0], div)
+
+        expect(ops[0]).to.be.instanceof(domOT.Move)
+        expect(ops[0].from).to.be.null
+        expect(ops[0].to).to.deep.equal([0])
+
+        cb()
+      }
+    })
+    
+    it('should overtake deletes', function(cb) {
+      var p = document.createElement('p')
+      div.appendChild(p)
+
+      var observer = new MutationSummary({
+        callback: onChange, // required
+        rootNode: div,
+        oldPreviousSibling: true,
+        queries: [ { all: true} ]
+      })
+      
+      div.removeChild(p)
+
+      function onChange(summaries) {
+        var ops = domOT.adapters.mutationSummary.import(summaries[0], div)
+
+        expect(ops[0]).to.be.instanceof(domOT.Move)
+        expect(ops[0].to).to.be.null
+        expect(ops[0].from).to.deep.equal([0])
+
+        cb()
+      }
+    })
+    
+    it('should overtake attrib changes', function(cb) {
+      var observer = new MutationSummary({
+        callback: onChange, // required
+        rootNode: div,
+        oldPreviousSibling: true,
+        queries: [ { all: true} ]
+      })
+      
+      div.setAttribute('class', 'foo')
+
+      function onChange(summaries) {
+        var ops = domOT.adapters.mutationSummary.import(summaries[0], div)
+
+        expect(ops[0]).to.be.instanceof(domOT.Manipulate)
+        expect(ops[0].path).to.deep.equal([])
+        expect(ops[0].prop).to.equal('class')
+        expect(ops[0].value).to.equal('foo')
+
+        cb()
+      }
+    })
+    
+    it('should overtake textNode changes', function(cb) {
+      div.appendChild(document.createTextNode('hello world'))
+      
+      var observer = new MutationSummary({
+        callback: onChange, // required
+        rootNode: div,
+        oldPreviousSibling: true,
+        queries: [ { all: true} ]
+      })
+      
+      div.firstChild.nodeValue = 'hello my world!'
+
+      function onChange(summaries) {
+        var ops = domOT.adapters.mutationSummary.import(summaries[0], div)
+
+        expect(ops[0]).to.be.instanceof(domOT.ManipulateText)
+        expect(ops[0].path).to.deep.equal([0])
+        
+        var div2 = document.createElement('div')
+        div2.appendChild(document.createTextNode('hello world'))
+        ops[0].apply(div2)
+        expect(div2.firstChild.nodeValue).to.equal('hello my world!')
+
+        cb()
+      }
     })
   })
 })
