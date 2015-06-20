@@ -6,6 +6,9 @@
   "directories": {
     "test": "test"
   },
+  "dependencies": {
+    "dom-serialize": "2.x"
+  },
   "devDependencies": {
     "browserify": "^10.1.0",
     "chai": "^2.3.0",
@@ -15,7 +18,7 @@
     "mutation-summary": "0.x"
   },
   "scripts": {
-    "test": "mocha-phantomjs test/index.html",
+    "test": "browserify test/tests.js > test/bundle.js && mocha-phantomjs test/index.html",
     "dist": "browserify index.js -s domOT > bundle.js"
   },
   "repository": {
