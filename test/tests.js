@@ -129,5 +129,47 @@ describe('dom-ot', function() {
       manipulate.transformAgainst(move2)
       manipulate.path.should.deep.equal([1,1])
     })
+    
+    it('should transform `ManipulateText#path` correctly for siblings removed', function() {
+      var manipulate = new domOT.ManipulateText([0,1], 'diff')
+        , move2 = new domOT.Move([0,0], null)
+      manipulate.transformAgainst(move2)
+      manipulate.path.should.deep.equal([0,0])
+    })
+    
+    it('should transform `ManipulateText#path` correctly for siblings removed', function() {
+      var manipulate = new domOT.ManipulateText([0,0], 'diff')
+        , move2 = new domOT.Move([0,1], null)
+      manipulate.transformAgainst(move2)
+      manipulate.path.should.deep.equal([0,0])
+    })
+    
+    it('should transform `ManipulateText#path` correctly for siblings added', function() {
+      var manipulate = new domOT.ManipulateText([0,0], 'diff')
+        , move2 = new domOT.Move(null, [0,0])
+      manipulate.transformAgainst(move2)
+      manipulate.path.should.deep.equal([0,1])
+    })
+    
+    it('should transform `ManipulateText#path` correctly for siblings added', function() {
+      var manipulate = new domOT.ManipulateText([0,0], 'diff')
+        , move2 = new domOT.Move(null, [0,1])
+      manipulate.transformAgainst(move2)
+      manipulate.path.should.deep.equal([0,0])
+    })
+    
+    it('should transform `ManipulateText#path` correctly for parents moved', function() {
+      var manipulate = new domOT.ManipulateText([0,1], 'diff')
+        , move2 = new domOT.Move([0], [1])
+      manipulate.transformAgainst(move2)
+      manipulate.path.should.deep.equal([1,1])
+    })
+    
+    it('should transform `ManipulateText#path` correctly for node moved', function() {
+      var manipulate = new domOT.ManipulateText([0,1], 'diff')
+        , move2 = new domOT.Move([0,1], [1,1])
+      manipulate.transformAgainst(move2)
+      manipulate.path.should.deep.equal([1,1])
+    })
   })
 })
