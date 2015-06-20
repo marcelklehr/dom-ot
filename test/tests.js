@@ -2,7 +2,7 @@ var chai = require('chai')
   , should = chai.should()
   , expect = chai.expect
   , domOT = require('../')
-  , MutationSummary = require('./lib/mutation-summary')
+  , MutationSummary = require('mutation-summary')
 
 describe('dom-ot', function() {
   describe('transformations', function() {

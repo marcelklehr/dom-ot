@@ -11,7 +11,8 @@
     "chai": "^2.3.0",
     "mocha": "^2.2.4",
     "mocha-phantomjs": "^3.5.3",
-    "phantomjs": "^1.9.17"
+    "phantomjs": "^1.9.17",
+    "mutation-summary": "0.x"
   },
   "scripts": {
     "test": "mocha-phantomjs test/index.html",
