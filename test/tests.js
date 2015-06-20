@@ -275,4 +275,85 @@ describe('dom-ot', function() {
       }
     })
   })
+  
+  describe('applications', function() {
+    var div
+    beforeEach(function() {
+      div = document.createElement('div')
+    })
+
+    it('should insert a node', function() {
+      var op = new domOT.Move(null, [0], '<i></i>')
+      op.apply(div)
+      
+      expect(div.firstChild).to.be.instanceof(Element)
+      expect(div.firstChild.tagName.toLowerCase()).to.equal('i')
+    })
+    
+    it('should insert a node as a sibling', function() {
+      div.appendChild(document.createElement('p'))
+      div.appendChild(document.createElement('p'))
+      var op = new domOT.Move(null, [1], '<i></i>')
+      op.apply(div)
+      
+      expect(div.childNodes[1]).to.be.instanceof(Element)
+      expect(div.childNodes[1].tagName.toLowerCase()).to.equal('i')
+    })
+    
+    it('should delete a node', function() {
+      div.appendChild(document.createElement('i'))
+    
+      var op = new domOT.Move([0], null, '<i></i>')
+      op.apply(div)
+      
+      expect(div.childNodes.length).to.equal(0)
+    })
+    
+    it('should delete a node as a sibling', function() {
+      div.appendChild(document.createElement('p'))
+      div.appendChild(document.createElement('i'))
+      div.appendChild(document.createElement('p'))
+      var op = new domOT.Move([1], null, '<i></i>')
+      op.apply(div)
+      
+      expect(div.childNodes.length).to.equal(2)
+      expect(div.childNodes[0].tagName.toLowerCase()).to.equal('p')
+      expect(div.childNodes[1].tagName.toLowerCase()).to.equal('p')
+    })
+    
+    it('should move a node', function() {
+      div.appendChild(document.createElement('p'))
+      div.appendChild(document.createElement('i'))
+      
+      var op = new domOT.Move([1], [0,0], '<i></i>')
+      op.apply(div)
+      
+      expect(div.childNodes.length).to.equal(1)
+      expect(div.childNodes[0].tagName.toLowerCase()).to.equal('p')
+      expect(div.childNodes[0].firstChild).to.be.instanceof(Element)
+      expect(div.childNodes[0].firstChild.tagName.toLowerCase()).to.equal('i')
+    })
+    
+    it('should move a node', function() {
+      div.appendChild(document.createElement('p'))
+      var i = document.createElement('i')
+      div.appendChild(i)
+      
+      var op = new domOT.Move([1], [0,0], '<i></i>')
+      op.apply(div)
+      
+      expect(div.childNodes.length).to.equal(1)
+      expect(div.childNodes[0].tagName.toLowerCase()).to.equal('p')
+      expect(div.childNodes[0].firstChild).to.be.instanceof(Element)
+      expect(div.childNodes[0].firstChild).to.equal(i)
+      expect(div.childNodes[0].firstChild.tagName.toLowerCase()).to.equal('i')
+    })
+    
+    it('should set an attribute', function() {
+      var op = new domOT.Manipulate([], 'class', 'foo')
+      op.apply(div)
+      
+      expect(div.getAttribute('class')).to.equal('foo')
+    })
+  })
 })
