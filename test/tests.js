@@ -268,7 +268,7 @@ describe('dom-ot', function() {
         
         var div2 = document.createElement('div')
         div2.appendChild(document.createTextNode('hello world'))
-        ops[0].apply(div2)
+        ops[0].apply(div2)// XXX: Needs revisiting when text diff is integrated
         expect(div2.firstChild.nodeValue).to.equal('hello my world!')
 
         cb()
@@ -354,6 +354,15 @@ describe('dom-ot', function() {
       op.apply(div)
       
       expect(div.getAttribute('class')).to.equal('foo')
+    })
+    
+    it('should set a textNode\'s value', function() {
+      var text = document.createTextNode('hello world!')
+      div.appendChild(text)
+      var op = new domOT.ManipulateText([0], 'hello my world!') // XXX: Needs revisiting when text diff is integrated
+      op.apply(div)
+      
+      expect(text.nodeValue).to.equal('hello my world!')
     })
   })
 })
