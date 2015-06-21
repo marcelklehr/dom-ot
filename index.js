@@ -5,15 +5,17 @@ exports.create = function(initialData) {
 }
 
 exports.apply = function(snapshot, ops) {
-  ops
+  unpackOps(ops)
   .forEach(function(op) {
     op.apply(snapshot)
   })
+  
+  return snapshot
 }
 
 exports.transform = function(ops1, ops2, side) {
-  ops1.forEach(function(op1) {
-    ops2.forEach(function(op2) {
+  unpackOps(ops1).forEach(function(op1) {
+    unpackOps(ops2).forEach(function(op2) {
       op1.transformAgainst(op2, ('left'==side))
     })
   })
@@ -35,6 +37,21 @@ exports.deserialize = function(data) {
     div.innerHTML = data
     return div.firstChild
   }
+}
+
+function unpackOps(ops) {
+  return ops.map(function(op) {
+    switch(op.type) {
+      case 'Move':
+        return new exports.Move(op.from, op.to, op.element)
+      case 'Manipulate':
+        return new exports.Manipulate(op.path, op.prop, op.value)
+      case 'ManipulateText':
+        return new exports.ManipulateText(op.path, op.diff)
+      default:
+        throw new Error('Unknown op type: '+op.type)
+    }
+  })
 }
 
 exports.Move = require('./lib/index').Move
