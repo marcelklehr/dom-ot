@@ -1,4 +1,4 @@
-
+var domSerialize = require('dom-serialize')
 
 exports.create = function(initialData) {
 
@@ -19,8 +19,22 @@ exports.transform = function(ops1, ops2, side) {
   })
 }
 
-exports.compose  = function(op1, op2) {
+exports.transformCursor = function(cursor, op) {
+  // https://developer.mozilla.org/en-US/docs/Web/API/Range/setStart
+}
+
+exports.serialize = function(snapshot) {
+  return domSerialize(snapshot)
+}
+
+exports.deserialize = function(data) {
+  if('undefined' == typeof document) {
   
+  }else{
+    var div = document.createElement('div')
+    div.innerHTML = data
+    return div.firstChild
+  }
 }
 
 exports.Move = require('./lib/index').Move
