@@ -1,4 +1,4 @@
-var domSerialize = require('dom-serialize')
+var domSerialize = require('dom-serializer')
 
 exports.create = function(initialData) {
 

@@ -7,7 +7,7 @@
     "test": "test"
   },
   "dependencies": {
-    "dom-serialize": "2.x"
+    "dom-serializer": "0.1.x"
   },
   "devDependencies": {
     "browserify": "^10.1.0",
