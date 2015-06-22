@@ -21,6 +21,11 @@ exports.transform = function(ops1, ops2, side) {
   })
 }
 
+exports.compose = function(ops1, ops2) {
+  exports.transform(ops2, ops1)
+  return ops1.concat(ops2)
+}
+
 exports.transformCursor = function(cursor, op) {
   // https://developer.mozilla.org/en-US/docs/Web/API/Range/setStart
 }
@@ -39,8 +44,8 @@ exports.deserialize = function(data) {
   }
 }
 
-function unpackOps(ops) {
-  return ops.map(function(op) {
+function unpackOps(unpackOps) {
+  return unpackOps.map(function(op) {
     switch(op.type) {
       case 'Move':
         return new exports.Move(op.from, op.to, op.element)
