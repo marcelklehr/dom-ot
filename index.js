@@ -9,7 +9,6 @@ exports.apply = function(snapshot, ops) {
   .forEach(function(op) {
     op.apply(snapshot)
   })
-  
   return snapshot
 }
 
@@ -44,7 +43,7 @@ exports.deserialize = function(data) {
   }
 }
 
-function unpackOps(unpackOps) {
+var unpackOps = exports.unpackOps = function(unpackOps) {
   return unpackOps.map(function(op) {
     switch(op.type) {
       case 'Move':
