@@ -363,6 +363,8 @@ describe('dom-ot', function() {
     })
     
     it('should overtake inserts', function(cb) {
+      domOT.adapters.mutationSummary.createIndex(div)
+      
       var observer = new MutationSummary({
         callback: onChange, // required
         rootNode: div,
@@ -386,6 +388,8 @@ describe('dom-ot', function() {
     it('should overtake deletes', function(cb) {
       var p = document.createElement('p')
       div.appendChild(p)
+      
+      domOT.adapters.mutationSummary.createIndex(div)
 
       var observer = new MutationSummary({
         callback: onChange, // required
@@ -408,6 +412,8 @@ describe('dom-ot', function() {
     })
     
     it('should overtake attrib changes', function(cb) {
+      domOT.adapters.mutationSummary.createIndex(div)
+      
       var observer = new MutationSummary({
         callback: onChange, // required
         rootNode: div,
@@ -431,6 +437,7 @@ describe('dom-ot', function() {
     
     it('should overtake textNode changes', function(cb) {
       div.appendChild(document.createTextNode('hello world'))
+      domOT.adapters.mutationSummary.createIndex(div)
       
       var observer = new MutationSummary({
         callback: onChange, // required
