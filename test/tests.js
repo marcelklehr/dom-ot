@@ -6,28 +6,42 @@ var chai = require('chai')
 
 describe('dom-ot', function() {
   describe('transformations', function() {
-    it('should transform `Move#from` correctly for siblings removed', function() {
+    it('should transform `Move#from` correctly for older siblings removed', function() {
       var move1 = new domOT.Move([0,1], null)
         , move2 = new domOT.Move([0,0], null)
       move1.transformAgainst(move2)
       move1.from.should.deep.equal([0,0])
     })
     
-    it('should transform `Move#from` correctly for siblings removed', function() {
+    it('should transform `Move#from` correctly for node removed', function() {
+      var move1 = new domOT.Move([0,1], null)
+        , move2 = new domOT.Move([0,1], null)
+      move1.transformAgainst(move2)
+      expect(move1.from).to.be.null
+    })
+    
+    it('should transform `Move#from` correctly for younger siblings removed', function() {
       var move1 = new domOT.Move([0,0], null)
         , move2 = new domOT.Move([0,1], null)
       move1.transformAgainst(move2)
       move1.from.should.deep.equal([0,0])
     })
     
-    it('should transform `Move#from` correctly for siblings added', function() {
+    it('should transform `Move#from` correctly for older siblings added', function() {
+      var move1 = new domOT.Move([0,3], null)
+        , move2 = new domOT.Move(null, [0,0])
+      move1.transformAgainst(move2)
+      move1.from.should.deep.equal([0,4])
+    })
+    
+    it('should transform `Move#from` correctly for equal siblings added', function() {
       var move1 = new domOT.Move([0,0], null)
         , move2 = new domOT.Move(null, [0,0])
       move1.transformAgainst(move2)
       move1.from.should.deep.equal([0,1])
     })
     
-    it('should transform `Move#from` correctly for siblings added', function() {
+    it('should transform `Move#from` correctly for younger siblings added', function() {
       var move1 = new domOT.Move([0,0], null)
         , move2 = new domOT.Move(null, [0,1])
       move1.transformAgainst(move2)
@@ -41,35 +55,65 @@ describe('dom-ot', function() {
       move1.from.should.deep.equal([1,1])
     })
     
+    it('should transform `Move#from` correctly for older ancestor-sibling added', function() {
+      var move1 = new domOT.Move([1,0], null)
+        , move2 = new domOT.Move(null, [0])
+      move1.transformAgainst(move2)
+      move1.from.should.deep.equal([2,0])
+    })
+    
+    it('should transform `Move#from` correctly for younger ancestor-sibling added', function() {
+      var move1 = new domOT.Move([1,0], null)
+        , move2 = new domOT.Move(null, [2])
+      move1.transformAgainst(move2)
+      move1.from.should.deep.equal([1,0])
+    })
+    
+    it('should transform `Move#from` correctly for older ancestor-sibling removed', function() {
+      var move1 = new domOT.Move([1,0], null)
+        , move2 = new domOT.Move([0], null)
+      move1.transformAgainst(move2)
+      move1.from.should.deep.equal([0,0])
+    })
+
+    it('should transform `Move#from` correctly for younger ancestor-sibling removed', function() {
+      var move1 = new domOT.Move([1,0], null)
+        , move2 = new domOT.Move([2], null)
+      move1.transformAgainst(move2)
+      move1.from.should.deep.equal([1,0])
+    })
+    
     it('should transform `Move#from` correctly for node moved', function() {
       var move1 = new domOT.Move([0,1], null)
         , move2 = new domOT.Move([0,1], [1,1])
       move1.transformAgainst(move2)
       move1.from.should.deep.equal([1,1])
     })
-    
-    it('should transform `Move#to` correctly for siblings removed', function() {
+
+
+
+    it('should transform `Move#to` correctly for older siblings removed', function() {
       var move1 = new domOT.Move(null, [0,1])
         , move2 = new domOT.Move([0,0], null)
       move1.transformAgainst(move2)
       move1.to.should.deep.equal([0,0])
     })
     
-    it('should transform `Move#to` correctly for siblings removed', function() {
+    it('should transform `Move#to` correctly for younger siblings removed', function() {
       var move1 = new domOT.Move(null, [0,1])
         , move2 = new domOT.Move([0,2], null)
       move1.transformAgainst(move2)
       move1.to.should.deep.equal([0,1])
     })
     
-    it('should transform `Move#to` correctly for siblings added', function() {
+    it('should transform `Move#to` correctly for older siblings added', function() {
       var move1 = new domOT.Move(null, [0,1])
         , move2 = new domOT.Move(null, [0,0])
       move1.transformAgainst(move2)
       move1.to.should.deep.equal([0,2])
     })
     
-    it('should transform `Move#to` correctly for siblings added', function() {
+    it('should transform `Move#to` correctly for younger siblings added', function() {
       var move1 = new domOT.Move(null, [0,1])
         , move2 = new domOT.Move(null, [0,2])
       move1.transformAgainst(move2)
@@ -83,41 +127,92 @@ describe('dom-ot', function() {
       move1.to.should.deep.equal([1,0])
     })
     
-    it('should transform `Move#to` correctly for node moved', function() {
+    it('should transform `Move#to` correctly for equal sibling moved', function() {
       var move1 = new domOT.Move(null, [0,0])
         , move2 = new domOT.Move([0,0], [1,0])
       move1.transformAgainst(move2)
       move1.to.should.deep.equal([0,0])
     })
     
-    it('should transform `Manipulate#path` correctly for siblings removed', function() {
+    it('should transform `Move#to` correctly for older ancestor-sibling removed', function() {
+      var move1 = new domOT.Move(null, [1,0])
+        , move2 = new domOT.Move([0], null)
+      move1.transformAgainst(move2)
+      move1.to.should.deep.equal([0,0])
+    })
+    
+    it('should transform `Move#to` correctly for equal ancestor-sibling removed', function() {
+      var move1 = new domOT.Move(null, [1,0])
+        , move2 = new domOT.Move([1], null)
+      move1.transformAgainst(move2)
+      expect(move1.to).to.be.null
+    })
+    
+    it('should transform `Move#to` correctly for younger ancestor-sibling removed', function() {
+      var move1 = new domOT.Move(null, [1,0])
+        , move2 = new domOT.Move([2], null)
+      move1.transformAgainst(move2)
+      move1.to.should.deep.equal([1,0])
+    })
+    
+    it('should transform `Move#to` correctly for older ancestor-sibling added', function() {
+      var move1 = new domOT.Move(null, [1,0])
+        , move2 = new domOT.Move(null, [0])
+      move1.transformAgainst(move2)
+      move1.to.should.deep.equal([2,0])
+    })
+    
+    it('should transform `Move#to` correctly for equal ancestor-sibling added', function() {
+      var move1 = new domOT.Move(null, [1,0])
+        , move2 = new domOT.Move(null, [1])
+      move1.transformAgainst(move2)
+      move1.to.should.deep.equal([2,0])
+    })
+    
+    it('should transform `Move#to` correctly for younger ancestor-sibling added', function() {
+      var move1 = new domOT.Move(null, [1,0])
+        , move2 = new domOT.Move(null, [2])
+      move1.transformAgainst(move2)
+      move1.to.should.deep.equal([1,0])
+    })
+    
+    
+    
+    it('should transform `Manipulate#path` correctly for older siblings removed', function() {
       var manipulate = new domOT.Manipulate([0,1], 'data-attrib', 'value')
         , move2 = new domOT.Move([0,0], null)
       manipulate.transformAgainst(move2)
       manipulate.path.should.deep.equal([0,0])
     })
     
-    it('should transform `Manipulate#path` correctly for siblings removed', function() {
+    it('should transform `Manipulate#path` correctly for younger siblings removed', function() {
       var manipulate = new domOT.Manipulate([0,0], 'data-attrib', 'value')
         , move2 = new domOT.Move([0,1], null)
       manipulate.transformAgainst(move2)
       manipulate.path.should.deep.equal([0,0])
     })
     
-    it('should transform `Manipulate#path` correctly for siblings added', function() {
+    it('should transform `Manipulate#path` correctly for older siblings added', function() {
+      var manipulate = new domOT.Manipulate([0,3], 'data-attrib', 'value')
+        , move2 = new domOT.Move(null, [0,0])
+      manipulate.transformAgainst(move2)
+      manipulate.path.should.deep.equal([0,4])
+    })
+    
+    it('should transform `Manipulate#path` correctly for equal siblings added', function() {
       var manipulate = new domOT.Manipulate([0,0], 'data-attrib', 'value')
         , move2 = new domOT.Move(null, [0,0])
       manipulate.transformAgainst(move2)
       manipulate.path.should.deep.equal([0,1])
     })
     
-    it('should transform `Manipulate#path` correctly for siblings added', function() {
+    it('should transform `Manipulate#path` correctly for younger siblings added', function() {
       var manipulate = new domOT.Manipulate([0,0], 'data-attrib', 'value')
         , move2 = new domOT.Move(null, [0,1])
       manipulate.transformAgainst(move2)
       manipulate.path.should.deep.equal([0,0])
     })
-    
+
     it('should transform `Manipulate#path` correctly for parents moved', function() {
       var manipulate = new domOT.Manipulate([0,1], 'data-attrib', 'value')
         , move2 = new domOT.Move([0], [1])
@@ -131,6 +226,50 @@ describe('dom-ot', function() {
       manipulate.transformAgainst(move2)
       manipulate.path.should.deep.equal([1,1])
     })
+    
+    it('should transform `Manipulate#path` correctly for older ancestor-sibling removed', function() {
+      var manipulate = new domOT.Manipulate([1,0], 'data-attrib', 'value')
+        , move2 = new domOT.Move([0], null)
+      manipulate.transformAgainst(move2)
+      manipulate.path.should.deep.equal([0,0])
+    })
+    
+    it('should transform `Manipulate#path` correctly for equal ancestor-sibling removed', function() {
+      var manipulate = new domOT.Manipulate([1,0], 'data-attrib', 'value')
+        , move2 = new domOT.Move([1], null)
+      manipulate.transformAgainst(move2)
+      expect(manipulate.path).to.be.null
+    })
+    
+    it('should transform `Manipulate#path` correctly for younger ancestor-sibling removed', function() {
+      var manipulate = new domOT.Manipulate([1,0], 'data-attrib', 'value')
+        , move2 = new domOT.Move([2], null)
+      manipulate.transformAgainst(move2)
+      manipulate.path.should.deep.equal([1,0])
+    })
+    
+    it('should transform `Manipulate#path` correctly for older ancestor-sibling added', function() {
+      var manipulate = new domOT.Manipulate([1,0], 'data-attrib', 'value')
+        , move2 = new domOT.Move(null, [0])
+      manipulate.transformAgainst(move2)
+      manipulate.path.should.deep.equal([2,0])
+    })
+    
+    it('should transform `Manipulate#path` correctly for equal ancestor-sibling added', function() {
+      var manipulate = new domOT.Manipulate([1,0], 'data-attrib', 'value')
+        , move2 = new domOT.Move(null, [1])
+      manipulate.transformAgainst(move2)
+      manipulate.path.should.deep.equal([2,0])
+    })
+    
+    it('should transform `Manipulate#path` correctly for younger ancestor-sibling added', function() {
+      var manipulate = new domOT.Manipulate([1,0], 'data-attrib', 'value')
+        , move2 = new domOT.Move(null, [2])
+      manipulate.transformAgainst(move2)
+      manipulate.path.should.deep.equal([1,0])
+    })
+    
+    
     
     it('should transform `ManipulateText#path` correctly for siblings removed', function() {
       var manipulate = new domOT.ManipulateText([0,1], 'diff')
@@ -172,6 +311,48 @@ describe('dom-ot', function() {
         , move2 = new domOT.Move([0,1], [1,1])
       manipulate.transformAgainst(move2)
       manipulate.path.should.deep.equal([1,1])
+    })
+    
+    it('should transform `ManipulateText#path` correctly for older ancestor-sibling removed', function() {
+      var manipulate = new domOT.ManipulateText([1,0], 'diff')
+        , move2 = new domOT.Move([0], null)
+      manipulate.transformAgainst(move2)
+      manipulate.path.should.deep.equal([0,0])
+    })
+    
+    it('should transform `ManipulateText#path` correctly for equal ancestor-sibling removed', function() {
+      var manipulate = new domOT.ManipulateText([1,0], 'diff')
+        , move2 = new domOT.Move([1], null)
+      manipulate.transformAgainst(move2)
+      expect(manipulate.path).to.be.null
+    })
+    
+    it('should transform `ManipulateText#path` correctly for younger ancestor-sibling removed', function() {
+      var manipulate = new domOT.ManipulateText([1,0], 'diff')
+        , move2 = new domOT.Move([2], null)
+      manipulate.transformAgainst(move2)
+      manipulate.path.should.deep.equal([1,0])
+    })
+    
+    it('should transform `ManipulateText#path` correctly for older ancestor-sibling added', function() {
+      var manipulate = new domOT.ManipulateText([1,0], 'diff')
+        , move2 = new domOT.Move(null, [0])
+      manipulate.transformAgainst(move2)
+      manipulate.path.should.deep.equal([2,0])
+    })
+    
+    it('should transform `ManipulateText#path` correctly for equal ancestor-sibling added', function() {
+      var manipulate = new domOT.ManipulateText([1,0], 'diff')
+        , move2 = new domOT.Move(null, [1])
+      manipulate.transformAgainst(move2)
+      manipulate.path.should.deep.equal([2,0])
+    })
+    
+    it('should transform `ManipulateText#path` correctly for younger ancestor-sibling added', function() {
+      var manipulate = new domOT.ManipulateText([1,0], 'diff')
+        , move2 = new domOT.Move(null, [2])
+      manipulate.transformAgainst(move2)
+      manipulate.path.should.deep.equal([1,0])
     })
   })
   
