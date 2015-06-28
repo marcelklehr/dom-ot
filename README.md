@@ -1,6 +1,8 @@
 # dom-ot
 The DOM changes. You can [capture](https://github.com/marcelklehr/mutation-summary) those changes and [sync](https://github.com/marcelklehr/gulf) multiple documents in real-time using this library to transform the changes.
 
+[![browser support](https://ci.testling.com/marcelklehr/dom-ot.png)](https://ci.testling.com/marcelklehr/dom-ot)
+
 ## Install
 
 ```

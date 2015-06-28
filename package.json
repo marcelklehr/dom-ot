@@ -21,6 +21,15 @@
     "test": "browserify test/tests.js > test/bundle.js && mocha-phantomjs test/index.html",
     "dist": "browserify index.js -s domOT > bundle.js"
   },
+  "testling": {
+    "harness": "mocha",
+    "files": "test/tests.js",
+    "browsers": [
+      "ie/8..latest",
+      "chrome/latest",
+      "firefox/latest"
+    ]
+  },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/marcelklehr/dom-ot.git"
