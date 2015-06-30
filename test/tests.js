@@ -3,6 +3,9 @@ var chai = require('chai')
   , expect = chai.expect
   , domOT = require('../')
   , MutationSummary = require('mutation-summary')
+  , Changeset = require('changesets').Changeset
+  , diff_match_patch = require('diff_match_patch').diff_match_patch
+  , diffEngine = new diff_match_patch
 
 describe('dom-ot', function() {
   describe('transformations', function() {
@@ -354,6 +357,18 @@ describe('dom-ot', function() {
       manipulate.transformAgainst(move2)
       manipulate.path.should.deep.equal([1,0])
     })
+    
+    it('should transform `ManipulateText#diff` correctly for other diff', function() {
+      var div = document.createElement('div')
+      div.appendChild(document.createTextNode('abc'))
+      var manipulate = new domOT.ManipulateText([0], Changeset.fromDiff(diffEngine.diff_main('abc','abcd')).pack())
+        , manipulate2 = new domOT.ManipulateText([0], Changeset.fromDiff(diffEngine.diff_main('abc','1abc')).pack())
+      manipulate.transformAgainst(manipulate2)
+      expect(manipulate.path).to.deep.equal([0])
+      manipulate2.apply(div)
+      manipulate.apply(div)
+      expect(div.firstChild.nodeValue).to.equal('1abcd') // This is just a simple text OT test, https://github.com/marcelklehr/changesets has complete coverage for all possible cases...
+    })
   })
   
   describe('mutationSummary adapter', function() {
@@ -457,7 +472,11 @@ describe('dom-ot', function() {
         var div2 = document.createElement('div')
         div2.appendChild(document.createTextNode('hello world'))
         ops[0].apply(div2)// XXX: Needs revisiting when text diff is integrated
+        try{
         expect(div2.firstChild.nodeValue).to.equal('hello my world!')
+        }catch(e) {
+          console.log(e)
+        }
 
         cb()
       }
@@ -547,7 +566,7 @@ describe('dom-ot', function() {
     it('should set a textNode\'s value', function() {
       var text = document.createTextNode('hello world!')
       div.appendChild(text)
-      var op = new domOT.ManipulateText([0], 'hello my world!') // XXX: Needs revisiting when text diff is integrated
+      var op = new domOT.ManipulateText([0], Changeset.fromDiff(diffEngine.diff_main('hello world!','hello my world!')).pack())
       op.apply(div)
       
       expect(text.nodeValue).to.equal('hello my world!')

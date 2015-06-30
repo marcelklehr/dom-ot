@@ -8,6 +8,8 @@
   },
   "dependencies": {
     "serialize-dom": "3.x"
+  , "changesets": "0.4.x"
+  , "diff_match_patch": "0.1.x"
   },
   "devDependencies": {
     "browserify": "^10.1.0",
