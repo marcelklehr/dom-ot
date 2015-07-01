@@ -21,7 +21,7 @@ exports.transform = function(ops1, ops2, side) {
 }
 
 exports.compose = function(ops1, ops2) {
-  exports.transform(ops2, ops1)
+  //exports.transform(ops2, ops1)
   return ops1.concat(ops2)
 }
 
