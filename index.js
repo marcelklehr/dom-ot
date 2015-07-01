@@ -1,4 +1,8 @@
 var domSerialize = require('serialize-dom')
+  , nodeAt = require('./lib/ops/node-at')
+  , pathTo = require('./lib/path-to')
+  , Changeset = require('changesets').Changeset
+  , ManipulateText = require('./lib/ops/manipulate-text')
 
 exports.create = function(initialData) {
 
@@ -13,10 +17,11 @@ exports.apply = function(snapshot, ops) {
 }
 
 exports.transform = function(ops1, ops2, side) {
-  unpackOps(ops1).forEach(function(op1) {
+  return unpackOps(ops1).map(function(op1) {
     unpackOps(ops2).forEach(function(op2) {
       op1.transformAgainst(op2, ('left'==side))
     })
+    return op1
   })
 }
 
@@ -25,8 +30,48 @@ exports.compose = function(ops1, ops2) {
   return ops1.concat(ops2)
 }
 
-exports.transformCursor = function(cursor, op) {
-  // https://developer.mozilla.org/en-US/docs/Web/API/Range/setStart
+exports.transformCursor = function(range, ops, rootNode) {
+  range = range.cloneRange()
+  if(rootNode.contains(range.startContainer)) {
+    var cs = Changeset.create()
+            .retain(range.startOffset)
+            .insert('|')
+            .retain(range.startContainer.nodeValue.length-range.startOffset)
+            .end()
+            .pack()
+    var cursorOps = [new ManipulateText(pathTo(range.startContainer, rootNode), cs)]
+    cursorOps = exports.transform(cursorOps, ops, 'right')
+    var cursorOp = cursorOps[0]
+    var length = countInitialRetains(cursorOp.diff)
+    if(cursorOp.path === null) range.collapse(false)
+    else range.setStart(nodeAt(cursorOp.path, rootNode), length)
+  }
+  if(rootNode.contains(range.endContainer)) {
+    var cs = Changeset.create()
+            .retain(range.endOffset)
+            .insert('|')
+            .retain(range.endContainer.nodeValue.length-range.endOffset)
+            .end()
+            .pack()
+    var cursorOps = [new ManipulateText(pathTo(range.endContainer, rootNode), cs)]
+    cursorOps = exports.transform(cursorOps, ops, 'right')
+    var cursorOp = cursorOps[0]
+    var length = countInitialRetains(cursorOp.diff)
+    if(cursorOp.path === null) range.collapse(true)
+    else range.setEnd(nodeAt(cursorOp.path, rootNode), length)
+  }
+  
+  return range
+}
+
+function countInitialRetains(cs) {
+  var length = 0
+  var ops = Changeset.unpack(cs)
+  for(var i=0; i<ops.length; i++) {
+    if(ops[i].input === ops[i].output) length += ops[i].length
+    else break
+  }
+  return length
 }
 
 exports.serialize = function(snapshot) {
