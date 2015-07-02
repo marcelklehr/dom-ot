@@ -9,6 +9,7 @@ exports.create = function(initialData) {
 }
 
 exports.apply = function(snapshot, ops) {
+  snapshot = snapshot.cloneNode(true)
   unpackOps(ops)
   .forEach(function(op) {
     op.apply(snapshot)
@@ -32,7 +33,7 @@ exports.compose = function(ops1, ops2) {
 
 exports.transformCursor = function(range, ops, rootNode) {
   range = range.cloneRange()
-  if(rootNode.contains(range.startContainer)) {
+  if(rootNode.contains(range.startContainer) && range.startContainer.nodeValue) {
     var cs = Changeset.create()
             .retain(range.startOffset)
             .insert('|')
@@ -42,11 +43,10 @@ exports.transformCursor = function(range, ops, rootNode) {
     var cursorOps = [new ManipulateText(pathTo(range.startContainer, rootNode), cs)]
     cursorOps = exports.transform(cursorOps, ops, 'right')
     var cursorOp = cursorOps[0]
-    var length = countInitialRetains(cursorOp.diff)
-    if(cursorOp.path === null) range.collapse(false)
-    else range.setStart(nodeAt(cursorOp.path, rootNode), length)
+    var start = nodeAt(cursorOp.path, rootNode)
+    var startLength = countInitialRetains(cursorOp.diff)
   }
-  if(rootNode.contains(range.endContainer)) {
+  if(rootNode.contains(range.endContainer) && range.endContainer.nodeValue) {
     var cs = Changeset.create()
             .retain(range.endOffset)
             .insert('|')
@@ -56,9 +56,28 @@ exports.transformCursor = function(range, ops, rootNode) {
     var cursorOps = [new ManipulateText(pathTo(range.endContainer, rootNode), cs)]
     cursorOps = exports.transform(cursorOps, ops, 'right')
     var cursorOp = cursorOps[0]
+    var end = nodeAt(cursorOp.path, rootNode)
     var length = countInitialRetains(cursorOp.diff)
-    if(cursorOp.path === null) range.collapse(true)
-    else range.setEnd(nodeAt(cursorOp.path, rootNode), length)
+  }
+
+  try {
+    if(!start) range.collapse(false)
+    else range.setStart(start, length)
+    
+    if(!end) range.collapse(true)
+    else range.setEnd(end, length)
+  }catch(e) {
+  
+  }
+  
+  try {
+    if(!end) range.collapse(true)
+    else range.setEnd(end, length)
+    
+    if(!start) range.collapse(false)
+    else range.setStart(start, length)
+  }catch(e) {
+  
   }
   
   return range
