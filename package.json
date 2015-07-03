@@ -42,7 +42,7 @@
     "dom"
   ],
   "author": "Marcel Klehr <mklehr@gmx.net>",
-  "license": "MIT",
+  "license": "GPL",
   "bugs": {
     "url": "https://github.com/marcelklehr/dom-ot/issues"
   },
