@@ -7,9 +7,11 @@
     "test": "test"
   },
   "dependencies": {
-    "serialize-dom": "3.x"
+    "vdom-virtualize": "*"
+  , "vdom-to-html": "*"
   , "changesets": "0.4.x"
   , "diff_match_patch": "0.1.x"
+  , "jsdom": "*"
   },
   "devDependencies": {
     "browserify": "^10.1.0",

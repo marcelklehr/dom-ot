@@ -16,14 +16,17 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-var domSerialize = require('serialize-dom')
+var virtualize = require('vdom-virtualize')
   , nodeAt = require('./lib/ops/node-at')
   , pathTo = require('./lib/path-to')
   , Changeset = require('changesets').Changeset
   , ManipulateText = require('./lib/ops/manipulate-text')
 
 exports.create = function(initialData) {
-
+  var requireJSDOM = 'node-jsdom'
+    , jsdom = require(requireJSDOM).jsdom
+  var document = jsdom('<div></div>')
+  return document.body.firstChild
 }
 
 exports.apply = function(snapshot, ops) {
@@ -112,17 +115,60 @@ function countInitialRetains(cs) {
 }
 
 exports.serialize = function(snapshot) {
-  return domSerialize(snapshot)
+  return JSON.stringify(virtualize(snapshot))
 }
 
-exports.deserialize = function(data) {
-  if('undefined' == typeof document) {
-  
-  }else{
-    var div = document.createElement('div')
-    div.innerHTML = data
-    return div.firstChild
+exports.deserialize = function(data, document) {
+  var virtual = JSON.parse(data)
+  if(!document) {
+    if('undefined' == typeof window) {
+      var requireJSDOM = 'node-jsdom'
+        , jsdom = require(requireJSDOM).jsdom
+      document = jsdom('<div></div>')
+    }else{
+      document = window.document
+    }
   }
+  return devirtualize(document, virtual)
+}
+
+function devirtualize(document, virtual) {
+  var node
+  if(typeof virtual.tagName !== 'undefined') {
+    if(virtual.namespace) {
+      node = document.createElementNS(virtual.namespace, virtual.tagName)
+    }else{
+      node = document.createElement(virtual.tagName)
+    }
+  }
+  if(typeof virtual.text !== 'undefined') {
+    node = document.createTextNode(virtual.text)
+  }
+  if(virtual.properties) {
+    for(var prop in virtual.properties) {
+      if(prop == 'attributes') {
+        for(var attr in virtual.properties.attributes) {
+          node.setAttribute(attr, virtual.properties.attributes[attr])
+        }
+      }else {
+        if('object' === typeof virtual.properties[prop]) {
+          for(var p in virtual.properties[prop]) {
+            node[prop][p] = virtual.properties[prop][p]
+          }
+        }else{
+          node[prop] = virtual.properties[prop]
+        }
+      }
+    }
+  }
+  if(virtual.children) {
+    virtual.children
+    .map(devirtualize.bind(null, document))
+    .forEach(function(n) {
+      node.appendChild(n)
+    })
+  }
+  return node
 }
 
 var unpackOps = exports.unpackOps = function(unpackOps) {
