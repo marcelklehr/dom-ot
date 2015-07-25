@@ -25,7 +25,7 @@ var virtualize = require('vdom-virtualize')
 exports.create = function(initialData) {
   var requireJSDOM = 'node-jsdom'
     , jsdom = require(requireJSDOM).jsdom
-  var document = jsdom('<div></div>')
+  var document = jsdom(initialData||'<div>Hello world</div>')
   return document.body.firstChild
 }
 
