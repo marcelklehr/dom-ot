@@ -43,6 +43,9 @@ Before installing a MutationObserver with MutationSummary and importing the chan
 ##### domOT.adapters.mutationSummary.createIndex(rootNode)
 Creates an index for all children of rootNode which is necessary for `import()` to work.
 
+## Tests
+Run `browserify test/tests.js > bundle.js`, then open `test/index.html` in the browser of your choice.
+
 ## Legal
 (c) 2015 by Marcel Klehr
 
