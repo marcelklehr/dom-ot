@@ -426,6 +426,425 @@ describe('dom-ot', function() {
       }
     })
 
+    it('should not insert a newly wrapped node twice', function(cb) {
+      var i, p
+      div.appendChild(i = document.createElement('i'))
+
+      var newdiv = div.cloneNode(true)
+
+      domOT.adapters.mutationSummary.createIndex(div)
+
+      var observer = new MutationSummary({
+        callback: onChange, // required
+        rootNode: div,
+        oldPreviousSibling: true,
+        queries: [ { all: true} ]
+      })
+
+      // make some changes: wrap the <i> in a <p>
+      div.removeChild(i)
+      div.appendChild(p = document.createElement('p'))
+      p.appendChild(i)
+
+      function onChange(summaries) {
+        var ops = domOT.adapters.mutationSummary.import(summaries[0], div)
+
+        newdiv = domOT.apply(newdiv, ops)
+
+        expect(domOT.serialize(newdiv)).to.equal(domOT.serialize(div))
+
+        cb()
+      }
+    })
+
+    it('should transform concurrent changes (two inserts)', function(cb) {
+      var i
+      div.appendChild(i = document.createElement('i'))
+
+      var newdiv = div.cloneNode(true)
+
+      domOT.adapters.mutationSummary.createIndex(div)
+
+      var observer = new MutationSummary({
+        callback: onChange, // required
+        rootNode: div,
+        oldPreviousSibling: true,
+        queries: [ { all: true} ]
+      })
+
+      // make some changes: add two children to the same element
+      div.insertBefore(document.createElement('b'), i)
+      div.appendChild(document.createElement('b'))
+
+      function onChange(summaries) {
+        var ops = domOT.adapters.mutationSummary.import(summaries[0], div)
+
+        newdiv = domOT.apply(newdiv, ops)
+
+        expect(domOT.serialize(newdiv)).to.equal(domOT.serialize(div))
+
+        cb()
+      }
+    })
+
+    it('should transform concurrent changes (two removes)', function(cb) {
+      var i, b
+      div.appendChild(i = document.createElement('i'))
+      div.appendChild(b = document.createElement('b'))
+
+      var newdiv = div.cloneNode(true)
+
+      domOT.adapters.mutationSummary.createIndex(div)
+
+      var observer = new MutationSummary({
+        callback: onChange, // required
+        rootNode: div,
+        oldPreviousSibling: true,
+        queries: [ { all: true} ]
+      })
+
+      // make some changes: add two children to the same element
+      div.removeChild(i)
+      div.removeChild(b)
+
+      function onChange(summaries) {
+        var ops = domOT.adapters.mutationSummary.import(summaries[0], div)
+
+        newdiv = domOT.apply(newdiv, ops)
+
+        expect(domOT.serialize(newdiv)).to.equal(domOT.serialize(div))
+
+        cb()
+      }
+    })
+
+    it('should transform concurrent changes (remove+insert)', function(cb) {
+      var b
+      div.appendChild(b = document.createElement('b'))
+
+      var newdiv = div.cloneNode(true)
+
+      domOT.adapters.mutationSummary.createIndex(div)
+
+      var observer = new MutationSummary({
+        callback: onChange, // required
+        rootNode: div,
+        oldPreviousSibling: true,
+        queries: [ { all: true} ]
+      })
+
+      // make some changes: insert some el before another and remove the latter
+      div.insertBefore(document.createElement('i'), b)
+      div.removeChild(b)
+
+      function onChange(summaries) {
+        var ops = domOT.adapters.mutationSummary.import(summaries[0], div)
+
+        newdiv = domOT.apply(newdiv, ops)
+
+        expect(domOT.serialize(newdiv)).to.equal(domOT.serialize(div))
+
+        cb()
+      }
+    })
+
+    it('should transform concurrent changes (remove>insert)', function(cb) {
+      var b, i
+      div.appendChild(b = document.createElement('b'))
+      div.appendChild(i = document.createElement('i'))
+
+      var newdiv = div.cloneNode(true)
+
+      domOT.adapters.mutationSummary.createIndex(div)
+
+      var observer = new MutationSummary({
+        callback: onChange, // required
+        rootNode: div,
+        oldPreviousSibling: true,
+        queries: [ { all: true} ]
+      })
+
+      // make some changes: insert some el before another and remove the latter
+      div.insertBefore(document.createElement('i'), b)
+      div.removeChild(i)
+
+      function onChange(summaries) {
+        var ops = domOT.adapters.mutationSummary.import(summaries[0], div)
+
+        newdiv = domOT.apply(newdiv, ops)
+
+        expect(domOT.serialize(newdiv)).to.equal(domOT.serialize(div))
+
+        cb()
+      }
+    })
+
+    it('should transform concurrent changes (insert+remove)', function(cb) {
+      var b
+      div.appendChild(b = document.createElement('b'))
+
+      var newdiv = div.cloneNode(true)
+
+      domOT.adapters.mutationSummary.createIndex(div)
+
+      var observer = new MutationSummary({
+        callback: onChange, // required
+        rootNode: div,
+        oldPreviousSibling: true,
+        queries: [ { all: true} ]
+      })
+
+      // make some changes: delete some el before another which is added
+      div.appendChild(document.createElement('i'))
+      div.removeChild(b)
+
+      function onChange(summaries) {
+        var ops = domOT.adapters.mutationSummary.import(summaries[0], div)
+
+        newdiv = domOT.apply(newdiv, ops)
+
+        expect(domOT.serialize(newdiv)).to.equal(domOT.serialize(div))
+
+        cb()
+      }
+    })
+
+    it('should transform concurrent changes (insert+manipulate)', function(cb) {
+      var i, b
+      div.appendChild(i = document.createElement('i'))
+      div.appendChild(b = document.createElement('b'))
+
+      var newdiv = div.cloneNode(true)
+
+      domOT.adapters.mutationSummary.createIndex(div)
+
+      var observer = new MutationSummary({
+        callback: onChange, // required
+        rootNode: div,
+        oldPreviousSibling: true,
+        queries: [ { all: true} ]
+      })
+
+      // make some changes: add an element and set an attribute
+      div.insertBefore(document.createElement('b'), i)
+      b.setAttribute('id', 'foobar')
+
+      function onChange(summaries) {
+        var ops = domOT.adapters.mutationSummary.import(summaries[0], div)
+
+        newdiv = domOT.apply(newdiv, ops)
+
+        expect(domOT.serialize(newdiv)).to.equal(domOT.serialize(div))
+
+        cb()
+      }
+    })
+
+    it('should transform concurrent changes (remove+manipulate)', function(cb) {
+      var i, b
+      div.appendChild(i = document.createElement('i'))
+      div.appendChild(b = document.createElement('b'))
+
+      var newdiv = div.cloneNode(true)
+
+      domOT.adapters.mutationSummary.createIndex(div)
+
+      var observer = new MutationSummary({
+        callback: onChange, // required
+        rootNode: div,
+        oldPreviousSibling: true,
+        queries: [ { all: true} ]
+      })
+
+      // make some changes: remove an element and set an attribute
+      div.removeChild(i)
+      b.setAttribute('id', 'foobar')
+
+      function onChange(summaries) {
+        var ops = domOT.adapters.mutationSummary.import(summaries[0], div)
+
+        newdiv = domOT.apply(newdiv, ops)
+
+        expect(domOT.serialize(newdiv)).to.equal(domOT.serialize(div))
+
+        cb()
+      }
+    })
+
+    it('should transform concurrent changes (insert+manipulateText)', function(cb) {
+      var i, t
+      div.appendChild(i = document.createElement('i'))
+      i.appendChild(t = document.createTextNode(''))
+
+      var newdiv = div.cloneNode(true)
+
+      domOT.adapters.mutationSummary.createIndex(div)
+
+      var observer = new MutationSummary({
+        callback: onChange, // required
+        rootNode: div,
+        oldPreviousSibling: true,
+        queries: [ { all: true} ]
+      })
+
+      // make some changes: remove an element and set an attribute
+      div.insertBefore(document.createElement('b'), i)
+      t.nodeValue = 'foobar'
+
+      function onChange(summaries) {
+        var ops = domOT.adapters.mutationSummary.import(summaries[0], div)
+
+        newdiv = domOT.apply(newdiv, ops)
+
+        expect(domOT.serialize(newdiv)).to.equal(domOT.serialize(div))
+
+        cb()
+      }
+    })
+
+    it('should transform concurrent changes (remove+manipulateText)', function(cb) {
+      var i, b, t
+      div.appendChild(i = document.createElement('i'))
+      div.appendChild(b = document.createElement('b'))
+      b.appendChild(t = document.createTextNode(''))
+
+      var newdiv = div.cloneNode(true)
+
+      domOT.adapters.mutationSummary.createIndex(div)
+
+      var observer = new MutationSummary({
+        callback: onChange, // required
+        rootNode: div,
+        oldPreviousSibling: true,
+        queries: [ { all: true} ]
+      })
+
+      // make some changes: remove an element and set an attribute
+      div.removeChild(i)
+      t.nodeValue = 'foobar'
+
+      function onChange(summaries) {
+        var ops = domOT.adapters.mutationSummary.import(summaries[0], div)
+
+        newdiv = domOT.apply(newdiv, ops)
+
+        expect(domOT.serialize(newdiv)).to.equal(domOT.serialize(div))
+
+        cb()
+      }
+    })
+
+    it('should transform concurrent changes (move+move)', function(cb) {
+      var b, p, i
+      div.appendChild(b = document.createElement('b'))
+      div.appendChild(p = document.createElement('p'))
+      div.appendChild(i = document.createElement('i'))
+
+      var newdiv = div.cloneNode(true)
+
+      domOT.adapters.mutationSummary.createIndex(div)
+
+      var observer = new MutationSummary({
+        callback: onChange, // required
+        rootNode: div,
+        oldPreviousSibling: true,
+        queries: [ { all: true} ]
+      })
+
+      // make some changes: nove to nodes to the same element,
+      // while the second one has to change its to and from values
+      div.removeChild(b)
+      p.appendChild(b)
+      div.removeChild(i)
+      p.appendChild(i)
+
+      function onChange(summaries) {
+        var ops = domOT.adapters.mutationSummary.import(summaries[0], div)
+
+        newdiv = domOT.apply(newdiv, ops)
+
+        expect(domOT.serialize(newdiv)).to.equal(domOT.serialize(div))
+
+        cb()
+      }
+    })
+
+    it('should transform concurrent changes (move+remove)', function(cb) {
+      var p, i, b
+      div.appendChild(p = document.createElement('p'))
+      p.appendChild(i = document.createElement('i'))
+      div.appendChild(b = document.createElement('b'))
+
+      var newdiv = div.cloneNode(true)
+
+      domOT.adapters.mutationSummary.createIndex(div)
+
+      var observer = new MutationSummary({
+        callback: onChange, // required
+        rootNode: div,
+        oldPreviousSibling: true,
+        queries: [ { all: true} ]
+      })
+
+      // make some changes: remove a child from the older sibling of some other removal
+      p.removeChild(i)
+      div.removeChild(b)
+
+      function onChange(summaries) {
+        var ops = domOT.adapters.mutationSummary.import(summaries[0], div)
+
+        newdiv = domOT.apply(newdiv, ops)
+
+        expect(domOT.serialize(newdiv)).to.equal(domOT.serialize(div))
+
+        cb()
+      }
+    })
+
+    it('should transform concurrent changes with specific paths (move+remove)', function(cb) {
+      var b, p, i
+      div.appendChild(document.createElement('b'))
+      div.appendChild(document.createElement('b'))
+      div.appendChild(document.createElement('b'))
+      div.appendChild(document.createElement('b'))
+      div.appendChild(document.createElement('b'))
+      div.appendChild(document.createElement('b'))
+      div.appendChild(document.createElement('b'))
+      div.appendChild(document.createElement('b'))
+      div.appendChild(document.createElement('b'))
+      div.appendChild(b = document.createElement('b')) // [9]
+      div.appendChild(i = document.createElement('i')) // [10] <-- simple path.join('') will cause this element to appear before 9 since "10" < "9"
+      div.appendChild(p = document.createElement('p')) // [11]
+
+      var newdiv = div.cloneNode(true)
+
+      domOT.adapters.mutationSummary.createIndex(div)
+
+      var observer = new MutationSummary({
+        callback: onChange, // required
+        rootNode: div,
+        oldPreviousSibling: true,
+        queries: [ { all: true} ]
+      })
+
+      // make some changes: nove to nodes to the same element,
+      // while the second one has to change its to and from values
+      div.removeChild(b)
+      //p.appendChild(b)
+      div.removeChild(i)
+      p.appendChild(i)
+
+      function onChange(summaries) {
+        var ops = domOT.adapters.mutationSummary.import(summaries[0], div)
+
+        newdiv = domOT.apply(newdiv, ops)
+
+        expect(domOT.serialize(newdiv)).to.equal(domOT.serialize(div))
+
+        cb()
+      }
+    })
+
     it('should overtake attrib changes', function(cb) {
       domOT.adapters.mutationSummary.createIndex(div)
 
