@@ -1,5 +1,5 @@
 # dom-ot
-The DOM changes. You can [capture](https://github.com/marcelklehr/mutation-summary) those changes and [sync](https://github.com/marcelklehr/gulf) multiple documents in real-time using this library to transform the changes for automagic conflict resolution. Sounds awesome? It is. To learn more about operational transformation, go to [wikipedia](http://en.wikipedia.org/wiki/Operational_transformation) or check out this [guide to textual ot](http://github.com/marcelklehr/changesets).
+The DOM changes. You can [capture](https://github.com/marcelklehr/mutation-summary) those changes and [sync](https://github.com/marcelklehr/gulf) multiple documents in real-time using this library to transform the changes for automagic conflict resolution. Sounds awesome? It is. To learn more about operational transformation, go to [wikipedia](http://en.wikipedia.org/wiki/Operational_transformation) or check out this [guide to textual ot](http://github.com/marcelklehr/changesets#usage).
 
 [![browser support](https://ci.testling.com/marcelklehr/dom-ot.png)](https://ci.testling.com/marcelklehr/dom-ot)
 
@@ -12,7 +12,7 @@ npm install dom-ot
 ## API
 
 ### domOT
-The object you get from `require('dom-ot')` is a full-featured shareJS ottype. This allows you to use dom-ot together with [shareJS](https://github.com/share/sharejs) or the more unixy [gulf](https://github.com/marcelklehr/gulf). The shareJS interface will deal only with edits. AN edit is essentially an array of operations.
+The object you get from `require('dom-ot')` is a full-featured shareJS ottype. This allows you to use dom-ot together with [shareJS](https://github.com/share/sharejs) or the more unixy [gulf](https://github.com/marcelklehr/gulf). The shareJS interface will deal only with edits. An edit is essentially an array of operations.
 
 ### new domOT.Move(fromPath, toPath, [serializedNode])
 This operation allows you to move a node from one path to another. Set `fromPath` to null to insert a node into the tree (which should be passed as `serializedNode`, serialized with [vdom-serialize](http://github.com/marcelklehr/vdom-serialize)).
@@ -24,10 +24,10 @@ This operation allows you to set an attribute named `attribute` of a given node 
 ### new domOT.ManipulateText(path, diff)
 This operation allows you to modify the `nodeValue` of a text node, by specifying a diff (which should be a packed [changeset](https://github.com/marcelklehr/changesets)).
 
-### <Operation>#transformAgainst(op, [left])
+### Operation#transformAgainst(op, [left])
 Transforms this operation *in-place* against another one, so that it assumes the changes of the other one have already happened. Use `left` to break ties.
 
-### <Operation>#apply(rootNode, [index])
+### Operation#apply(rootNode, [index])
 Apply an operation on a document, specified by `rootNode`. Optionally, you may set `index` to `true`, to automatically index nodes for importing MutationSummaries (see the mutationSummary adapter).
 
 ### domOT.adapters
