@@ -84,23 +84,23 @@ exports.transformCursor = function(range, ops, rootNode) {
   try {
     if(!start) range.collapse(false)
     else range.setStart(start, length)
-    
+
     if(!end) range.collapse(true)
     else range.setEnd(end, length)
   }catch(e) {
-  
+
   }
-  
+
   try {
     if(!end) range.collapse(true)
     else range.setEnd(end, length)
-    
+
     if(!start) range.collapse(false)
     else range.setStart(start, length)
   }catch(e) {
-  
+
   }
-  
+
   return range
 }
 
