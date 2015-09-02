@@ -23,7 +23,7 @@ var virtualize = require('vdom-virtualize')
   , ManipulateText = require('./lib/ops/manipulate-text')
 
 exports.create = function(initialData) {
-  var requireJSDOM = 'node-jsdom'
+  var requireJSDOM = 'jsdom-no-contextify'
     , jsdom = require(requireJSDOM).jsdom
   var document = jsdom(initialData||'<div>Hello world</div>')
   return document.body.firstChild
