@@ -53,55 +53,34 @@ exports.compose = function(ops1, ops2) {
 }
 
 exports.transformCursor = function(range, ops, rootNode) {
-  range = range.cloneRange()
+  var start, end, newrange = {}
   if(rootNode.contains(range.startContainer) && range.startContainer.nodeValue) {
-    var cs = Changeset.create()
-            .retain(range.startOffset)
-            .insert('|')
-            .retain(range.startContainer.nodeValue.length-range.startOffset)
-            .end()
-            .pack()
-    var cursorOps = [new ManipulateText(pathTo(range.startContainer, rootNode), cs)]
-    cursorOps = exports.transform(cursorOps, ops, 'right')
-    var cursorOp = cursorOps[0]
-    var start = nodeAt(cursorOp.path, rootNode)
-    var startLength = countInitialRetains(cursorOp.diff)
+    start = transformCaret({container: range.startContainer, offset: range.startOffset}, ops, rootNode)
+    newrange.startContainer = start.container
+    newrange.startOffset = start.offset
   }
   if(rootNode.contains(range.endContainer) && range.endContainer.nodeValue) {
-    var cs = Changeset.create()
-            .retain(range.endOffset)
-            .insert('|')
-            .retain(range.endContainer.nodeValue.length-range.endOffset)
-            .end()
-            .pack()
-    var cursorOps = [new ManipulateText(pathTo(range.endContainer, rootNode), cs)]
-    cursorOps = exports.transform(cursorOps, ops, 'right')
-    var cursorOp = cursorOps[0]
-    var end = nodeAt(cursorOp.path, rootNode)
-    var length = countInitialRetains(cursorOp.diff)
+    end = transformCaret({container: range.endContainer, offset: range.endOffset}, ops, rootNode)
+    newrange.endContainer = end.container
+    newrange.endOffset = end.offset
   }
 
-  try {
-    if(!start) range.collapse(false)
-    else range.setStart(start, length)
+  return newrange
+}
 
-    if(!end) range.collapse(true)
-    else range.setEnd(end, length)
-  }catch(e) {
-
-  }
-
-  try {
-    if(!end) range.collapse(true)
-    else range.setEnd(end, length)
-
-    if(!start) range.collapse(false)
-    else range.setStart(start, length)
-  }catch(e) {
-
-  }
-
-  return range
+function transformCaret(caret, ops, rootNode) {
+  var cs = Changeset.create()
+          .retain(caret.offset)
+          .insert('|')
+          .retain(caret.container.nodeValue.length-caret.offset)
+          .end()
+          .pack()
+  var cursorOps = [new ManipulateText(pathTo(caret.container, rootNode), cs)]
+  cursorOps = exports.transform(cursorOps, ops, 'right')
+  var cursorOp = cursorOps[0]
+  var container = nodeAt(cursorOp.path, rootNode)
+  var offset = countInitialRetains(cursorOp.diff)
+  return {container: container, offset: offset}
 }
 
 function countInitialRetains(cs) {
