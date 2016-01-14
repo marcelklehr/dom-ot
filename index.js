@@ -17,8 +17,8 @@
  */
 
 var virtualize = require('vdom-virtualize')
-  , nodeAt = require('./lib/ops/node-at')
-  , pathTo = require('./lib/path-to')
+  , nodeAt = require('domnode-at-path')
+  , pathTo = require('path-to-domnode')
   , Changeset = require('changesets').Changeset
   , ManipulateText = require('./lib/ops/manipulate-text')
 

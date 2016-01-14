@@ -10,7 +10,9 @@
     "vdom-virtualize": "0.x",
     "changesets": "0.4.x",
     "diff_match_patch": "0.1.x",
-    "jsdom-no-contextify": "*"
+    "jsdom-no-contextify": "*",
+    "domnode-at-path": "1.x",
+    "path-to-domnode": "1.x"
   },
   "devDependencies": {
     "browserify": "^10.1.0",
