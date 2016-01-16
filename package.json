@@ -1,13 +1,14 @@
 {
   "name": "dom-ot",
-  "version": "2.1.1",
+  "version": "2.1.2",
   "description": "Operational transform library for DOM operations (conforms to shareJS' spec)",
   "main": "index.js",
   "directories": {
     "test": "test"
   },
   "dependencies": {
-    "vdom-virtualize": "0.x",
+    "vdom-virtualize": "1.x",
+    "virtual-dom": "2.x",
     "vdom-serialize": "1.x",
     "changesets": "0.4.x",
     "diff_match_patch": "0.1.x",
