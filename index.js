@@ -17,6 +17,7 @@
  */
 
 var virtualize = require('vdom-virtualize')
+  , serialize = require('vdom-serialize')
   , nodeAt = require('domnode-at-path')
   , pathTo = require('path-to-domnode')
   , Changeset = require('changesets').Changeset
@@ -94,7 +95,7 @@ function countInitialRetains(cs) {
 }
 
 exports.serialize = function(snapshot) {
-  return JSON.stringify(virtualize(snapshot))
+  return serialize(virtualize(snapshot))
 }
 
 exports.deserialize = function(data, document) {

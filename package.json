@@ -8,6 +8,7 @@
   },
   "dependencies": {
     "vdom-virtualize": "0.x",
+    "vdom-serialize": "1.x",
     "changesets": "0.4.x",
     "diff_match_patch": "0.1.x",
     "jsdom-no-contextify": "*",
