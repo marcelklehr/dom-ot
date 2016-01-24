@@ -102,7 +102,7 @@ exports.deserialize = function(data, document) {
   var virtual = JSON.parse(data)
   if(!document) {
     if('undefined' == typeof window) {
-      var requireJSDOM = 'node-jsdom'
+      var requireJSDOM = 'jsdom-no-contextify'
         , jsdom = require(requireJSDOM).jsdom
       document = jsdom('<div></div>')
     }else{
