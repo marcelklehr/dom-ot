@@ -49,4 +49,4 @@ Run `browserify test/tests.js > bundle.js`, then open `test/index.html` in the b
 ## Legal
 (c) 2015 by Marcel Klehr
 
-Licensed under the terms of the GPL. See `LICENSE.txt` in the root directory of this project.
+Licensed under the terms of the LGPL. See `LICENSE.txt` in the root directory of this project.
