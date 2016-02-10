@@ -1,5 +1,7 @@
 # dom-ot
-The DOM changes. You can [capture](https://github.com/marcelklehr/mutation-summary) those changes and [sync](https://github.com/marcelklehr/gulf) multiple documents in real-time using this library to transform the changes for automagic conflict resolution. Sounds awesome? It is. To learn more about operational transformation, go to [wikipedia](http://en.wikipedia.org/wiki/Operational_transformation) or check out this [guide to textual ot](http://github.com/marcelklehr/changesets#usage).
+The DOM changes. You can [capture](https://github.com/marcelklehr/mutation-summary) those changes and [sync](https://github.com/marcelklehr/gulf) multiple documents in real-time using this library to transform the changes for automagic conflict resolution.
+
+Sounds awesome? It is. To learn more about operational transformation, go to [wikipedia](http://en.wikipedia.org/wiki/Operational_transformation) or check out this [guide to textual ot](http://github.com/marcelklehr/changesets#usage). Also, check out [gulf-contenteditable](https://github.com/marcelklehr/gulf-contenteditable) for a ready-made wrapper.
 
 [![browser support](https://ci.testling.com/marcelklehr/dom-ot.png)](https://ci.testling.com/marcelklehr/dom-ot)
 
