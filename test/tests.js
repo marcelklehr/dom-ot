@@ -448,7 +448,41 @@ describe('dom-ot', function() {
 
       function onChange(summaries) {
         var ops = domOT.adapters.mutationSummary.import(summaries[0], div)
+        newdiv = domOT.apply(newdiv, ops)
 
+        expect(domOT.serialize(newdiv)).to.equal(domOT.serialize(div))
+
+        cb()
+      }
+    })
+
+
+    it('should overtake wrapping of text nodes', function(cb) {
+      var p, i
+      div.appendChild(p = document.createElement('p'))
+      p.appendChild(document.createTextNode('Huh. '))
+      p.appendChild(document.createTextNode('Hello world!'))
+
+      var newdiv = div.cloneNode(true)
+
+      domOT.adapters.mutationSummary.createIndex(div)
+
+      var observer = new MutationSummary({
+        callback: onChange, // required
+        rootNode: div,
+        oldPreviousSibling: true,
+        queries: [ { all: true} ]
+      })
+
+      // make some changes: concat the textNodes and wrap them in an <i>
+      i = document.createElement('i')
+      i.appendChild(p.removeChild(p.childNodes[0]))
+      i.childNodes[0].nodeValue += p.childNodes[0].nodeValue
+      p.removeChild(p.childNodes[0])
+      p.appendChild(i)
+
+      function onChange(summaries) {
+        var ops = domOT.adapters.mutationSummary.import(summaries[0], div)
         newdiv = domOT.apply(newdiv, ops)
 
         expect(domOT.serialize(newdiv)).to.equal(domOT.serialize(div))
