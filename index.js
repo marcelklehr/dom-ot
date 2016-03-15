@@ -60,10 +60,18 @@ exports.transformCursor = function(range, ops, rootNode) {
     newrange.startContainer = start.container
     newrange.startOffset = start.offset
   }
+  else {
+    newrange.startContainer = range.startContainer
+    newrange.startOffset = range.startOffset
+  }
   if(rootNode.contains(range.endContainer) && range.endContainer.nodeValue) {
     end = transformCaret({container: range.endContainer, offset: range.endOffset}, ops, rootNode)
     newrange.endContainer = end.container
     newrange.endOffset = end.offset
+  }
+  else {
+    newrange.endContainer = range.endContainer
+    newrange.endOffset = range.endOffset
   }
 
   return newrange
