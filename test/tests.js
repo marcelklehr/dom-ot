@@ -7,6 +7,15 @@ var chai = require('chai')
   , diff_match_patch = require('diff_match_patch').diff_match_patch
   , diffEngine = new diff_match_patch
 
+/*
+Table of contents
+
+ * transformations
+ * applications
+ * inversion
+ * mutationSummary adapter 
+*/
+
 describe('dom-ot', function() {
   describe('transformations', function() {
     it('should transform `Move#from` correctly for older siblings removed', function() {
@@ -368,6 +377,150 @@ describe('dom-ot', function() {
       manipulate2.apply(div)
       manipulate.apply(div)
       expect(div.firstChild.nodeValue).to.equal('1abcd') // This is just a simple text OT test, https://github.com/marcelklehr/changesets has complete coverage for all possible cases...
+    })
+  })
+  
+  describe('applications', function() {
+    var div
+    beforeEach(function() {
+      div = document.createElement('div')
+    })
+
+    it('should insert a node', function() {
+      var newnode = domOT.serialize(document.createElement('i'))
+        , op = new domOT.Move(null, [0], newnode)
+      op.apply(div)
+
+      expect(div.firstChild).to.be.instanceof(Element)
+      expect(div.firstChild.tagName.toLowerCase()).to.equal('i')
+    })
+
+    it('should insert a node as a sibling', function() {
+      div.appendChild(document.createElement('p'))
+      div.appendChild(document.createElement('p'))
+      var newnode = domOT.serialize(document.createElement('i'))
+        , op = new domOT.Move(null, [1], newnode)
+      op.apply(div)
+
+      expect(div.childNodes[1]).to.be.instanceof(Element)
+      expect(div.childNodes[1].tagName.toLowerCase()).to.equal('i')
+    })
+
+    it('should delete a node', function() {
+      div.appendChild(document.createElement('i'))
+
+      var newnode = domOT.serialize(document.createElement('i'))
+        , op = new domOT.Move([0], null, newnode)
+      op.apply(div)
+
+      expect(div.childNodes.length).to.equal(0)
+    })
+
+    it('should delete a node as a sibling', function() {
+      div.appendChild(document.createElement('p'))
+      div.appendChild(document.createElement('i'))
+      div.appendChild(document.createElement('p'))
+      var newnode = domOT.serialize(document.createElement('i'))
+        , op = new domOT.Move([1], null, newnode)
+      op.apply(div)
+
+      expect(div.childNodes.length).to.equal(2)
+      expect(div.childNodes[0].tagName.toLowerCase()).to.equal('p')
+      expect(div.childNodes[1].tagName.toLowerCase()).to.equal('p')
+    })
+
+    it('should move a node', function() {
+      div.appendChild(document.createElement('p'))
+      var i = document.createElement('i')
+      div.appendChild(i)
+
+      var op = new domOT.Move([1], [0,0])
+      op.apply(div)
+
+      expect(div.childNodes.length).to.equal(1)
+      expect(div.childNodes[0].tagName.toLowerCase()).to.equal('p')
+      expect(div.childNodes[0].firstChild).to.be.instanceof(Element)
+      expect(div.childNodes[0].firstChild).to.equal(i)
+      expect(div.childNodes[0].firstChild.tagName.toLowerCase()).to.equal('i')
+    })
+
+    it('should set an attribute', function() {
+      var op = new domOT.Manipulate([], 'class', 'foo')
+      op.apply(div)
+
+      expect(div.getAttribute('class')).to.equal('foo')
+    })
+
+    it('should set a textNode\'s value', function() {
+      var text = document.createTextNode('hello world!')
+      div.appendChild(text)
+      var op = new domOT.ManipulateText([0], Changeset.fromDiff(diffEngine.diff_main('hello world!','hello my world!')).pack())
+      op.apply(div)
+
+      expect(text.nodeValue).to.equal('hello my world!')
+    })
+  })
+
+  describe('inversion', function() {
+    var div
+    beforeEach(function() {
+      div = document.createElement('div')
+    })
+
+    it('should invert an insert', function() {
+      var initial = div.cloneNode(true)
+      var newnode = domOT.serialize(document.createElement('i'))
+        , op = new domOT.Move(null, [0], newnode)
+      op.apply(div)
+      op.invert()
+      op.apply(div)
+      
+      expect(div.outerHTML).to.equal(initial.outerHTML)
+    })
+    
+    it('should invert a removal', function() {
+      var el = document.createElement('i')
+      div.appendChild(el)
+      var initial = div.cloneNode(true)
+      var newnode = domOT.serialize(el)
+      var op = new domOT.Move([0], null, newnode)
+      op.apply(div)
+      op.invert()
+      op.apply(div)
+      
+      expect(div.outerHTML).to.equal(initial.outerHTML)
+    })
+    
+    it('should invert an attrib manipulation', function() {
+      div.setAttribute('class', 'foo')
+      var initial = div.cloneNode(true)
+      var op = new domOT.Manipulate([], 'class', 'bar', 'foo')
+      op.apply(div)
+      op.invert()
+      op.apply(div)
+      
+      expect(div.outerHTML).to.equal(initial.outerHTML)
+    })
+    
+    it('should invert an attrib insertion', function() {
+      var initial = div.cloneNode(true)
+      var op = new domOT.Manipulate([], 'class', 'bar')
+      op.apply(div)
+      op.invert()
+      op.apply(div)
+      
+      expect(div.outerHTML).to.equal(initial.outerHTML)
+    })
+    
+    it('should invert an attrib removal', function() {
+      div.setAttribute('class', 'foo')
+      var initial = div.cloneNode(true)
+      var op = new domOT.Manipulate([], 'class', null, 'foo')
+      op.apply(div)
+      op.invert()
+      op.apply(div)
+      
+      expect(div.outerHTML).to.equal(initial.outerHTML)
     })
   })
 
@@ -936,84 +1089,4 @@ describe('dom-ot', function() {
     })
   })
 
-  describe('applications', function() {
-    var div
-    beforeEach(function() {
-      div = document.createElement('div')
-    })
-
-    it('should insert a node', function() {
-      var newnode = domOT.serialize(document.createElement('i'))
-        , op = new domOT.Move(null, [0], newnode)
-      op.apply(div)
-
-      expect(div.firstChild).to.be.instanceof(Element)
-      expect(div.firstChild.tagName.toLowerCase()).to.equal('i')
-    })
-
-    it('should insert a node as a sibling', function() {
-      div.appendChild(document.createElement('p'))
-      div.appendChild(document.createElement('p'))
-      var newnode = domOT.serialize(document.createElement('i'))
-        , op = new domOT.Move(null, [1], newnode)
-      op.apply(div)
-
-      expect(div.childNodes[1]).to.be.instanceof(Element)
-      expect(div.childNodes[1].tagName.toLowerCase()).to.equal('i')
-    })
-
-    it('should delete a node', function() {
-      div.appendChild(document.createElement('i'))
-
-      var newnode = domOT.serialize(document.createElement('i'))
-        , op = new domOT.Move([0], null, newnode)
-      op.apply(div)
-
-      expect(div.childNodes.length).to.equal(0)
-    })
-
-    it('should delete a node as a sibling', function() {
-      div.appendChild(document.createElement('p'))
-      div.appendChild(document.createElement('i'))
-      div.appendChild(document.createElement('p'))
-      var newnode = domOT.serialize(document.createElement('i'))
-        , op = new domOT.Move([1], null, newnode)
-      op.apply(div)
-
-      expect(div.childNodes.length).to.equal(2)
-      expect(div.childNodes[0].tagName.toLowerCase()).to.equal('p')
-      expect(div.childNodes[1].tagName.toLowerCase()).to.equal('p')
-    })
-
-    it('should move a node', function() {
-      div.appendChild(document.createElement('p'))
-      var i = document.createElement('i')
-      div.appendChild(i)
-
-      var op = new domOT.Move([1], [0,0])
-      op.apply(div)
-
-      expect(div.childNodes.length).to.equal(1)
-      expect(div.childNodes[0].tagName.toLowerCase()).to.equal('p')
-      expect(div.childNodes[0].firstChild).to.be.instanceof(Element)
-      expect(div.childNodes[0].firstChild).to.equal(i)
-      expect(div.childNodes[0].firstChild.tagName.toLowerCase()).to.equal('i')
-    })
-
-    it('should set an attribute', function() {
-      var op = new domOT.Manipulate([], 'class', 'foo')
-      op.apply(div)
-
-      expect(div.getAttribute('class')).to.equal('foo')
-    })
-
-    it('should set a textNode\'s value', function() {
-      var text = document.createTextNode('hello world!')
-      div.appendChild(text)
-      var op = new domOT.ManipulateText([0], Changeset.fromDiff(diffEngine.diff_main('hello world!','hello my world!')).pack())
-      op.apply(div)
-
-      expect(text.nodeValue).to.equal('hello my world!')
-    })
-  })
 })

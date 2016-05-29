@@ -48,6 +48,13 @@ exports.transform = function(ops1, ops2, side) {
   })
 }
 
+exports.invert = function(ops) {
+  return unpackOps(ops).map(function(op) {
+    op.invert()
+    return op
+  })
+}
+
 exports.compose = function(ops1, ops2) {
   //exports.transform(ops2, ops1)
   return ops1.concat(ops2)
@@ -165,7 +172,7 @@ var unpackOps = exports.unpackOps = function(unpackOps) {
       case 'Move':
         return new exports.Move(op.from, op.to, op.element)
       case 'Manipulate':
-        return new exports.Manipulate(op.path, op.prop, op.value)
+        return new exports.Manipulate(op.path, op.prop, op.value, op.oldvalue)
       case 'ManipulateText':
         return new exports.ManipulateText(op.path, op.diff)
       default:
