@@ -49,10 +49,15 @@ exports.transform = function(ops1, ops2, side) {
 }
 
 exports.invert = function(ops) {
-  return unpackOps(ops).map(function(op) {
+  var unpacked = unpackOps(ops)
+  for (var i=0; i<unpacked.length; i++) {
+    var op = unpacked[i]
     op.invert()
-    return op
-  })
+    for (var j=0; j<i; j++) {
+      op.transformAgainst(unpacked[j])
+    }
+  }
+  return unpacked
 }
 
 exports.compose = function(ops1, ops2) {
